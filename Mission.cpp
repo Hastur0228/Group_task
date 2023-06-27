@@ -95,6 +95,8 @@ void login()
 		if (strcmp(encode_username, username.c_str()) == 0 && strcmp(encode_password, password.c_str()) == 0)
 		{
 			cout<<"登录成功！"<<endl;
+			encode(encode_username,encode_password);
+			FileInput(encode_username);
 			break;
 		}
 	}
