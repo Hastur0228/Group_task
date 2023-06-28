@@ -13,7 +13,7 @@ struct Time {
     int hour;
     int min;
     int sec;
-    Time(int y = 0, int mon = 0, int d = 0, int h = 0, int mi = 0, int s = 0)
+    Time(int h = 0, int mi = 0, int s = 0, int y = 0, int mon = 0, int d = 0)
     {
         year = y;
         month = mon;
@@ -22,7 +22,6 @@ struct Time {
         min = mi;
         sec = s;
     }
-    ~Time();
 };
 
 class mission {
