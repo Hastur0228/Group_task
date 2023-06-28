@@ -17,7 +17,7 @@ pthread_mutex_t mutex;//互斥锁
 int main(int argc,char *argv[]){
     if(argc!=2){//参数个数不匹配
         cout<<"INPUT ERROR: Invalid parameters\n";//输入错误，参数无效
-        exit(0);
+        exit(-1);
     }
     int result;//用来接收getopt的信息
     while((result=getopt(argc,argv,"h"))!=-1){
