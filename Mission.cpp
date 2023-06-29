@@ -88,7 +88,7 @@ void createuser()
 	encode(username, password);
 	//将加密后的用户名和密码写入文件
 	FILE *fp;
-	fp=fopen("user.txt","w");
+	fp=fopen("user.txt","a");
 	if (fp == NULL)
 	{
 		cout<<"打开文件失败！"<<endl;
