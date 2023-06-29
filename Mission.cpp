@@ -3,6 +3,9 @@
 #include<cstring>
 #include<stdlib.h>
 #include"CODEANDDECODE.h"
+#include<time.h>
+#include<queue>
+#include"main.cpp"
 using namespace std;
 /*
 待实现函数：
@@ -40,6 +43,39 @@ void Complete_help() {
 	cout<<"8.命令行参数：run exit\n";
 }
 
+//子线程后台提醒
+void *check(void *arg){
+	while(1){
+		pthread_mutex_lock(&mutex);//下面过程存在对任务文件改变的可能，故上锁
+		time_t now=time(0);
+    	struct tm* now_time;//tm来自time.h
+    	now_time=localtime(&now);    
+		Time top_task_time=task_array.top().get_reminding_time();
+		Time current_time=(now_time->tm_year,now_time->tm_mon,now_time->tm_mday,now_time->tm_hour,now_time->tm_min,now_time->tm_sec);
+		if(time_cpr(current_time,top_task_time)==2){//说明当前时间就是最早提醒时间，需要立刻提醒
+			system("clear");
+			cout<<"！！！！！！！！！！！\n";
+			cout<<"您有任务已到达提醒时间\n";
+			cout<<"请合理安排你的时间\n";
+			cout<<"！！！！！！！！！！！\n";
+			task_array.top().show();
+			task_array.pop();
+			synchronize();
+		}
+		else if(time_cpr(current_time,top_task_time)==1){//当前时间晚于最早提醒时间了，说明之前预设的提醒时间存在错误
+        	//此时指出用户的提醒时间有设置错误现象
+			cout<<"！！！！！！！！！！！\n";
+        	cout<<"您预设的提醒时间可能有误，任务已超时\n";
+			cout<<"！！！！！！！！！！！\n";
+		}
+		//否则就是，当前时间早于最早提醒时间时,尚且不用提醒
+		pthread_mutex_unlock(&mutex);
+		sleep(1);//帮助回到主线程
+	}
+	return NULL;
+}
+
+
 void createuser()
 {
 	string username;
@@ -64,6 +100,7 @@ void createuser()
 	fputs("\n",fp);
 	fclose(fp);
 }
+
 void login()
 {
 	string username;
@@ -125,4 +162,10 @@ void run(){
     else if(strcasecmp(cmd,"clearTask")){
         clearTask();
     }
+	else if(strcasecmp(cmd,"quit")){
+		exit(0);
+	}
+	else {
+		cout<<"Can't Find Your Commmand\n";
+	}
 }
