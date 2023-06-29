@@ -1,11 +1,17 @@
 #pragma once
-#include<ctime>
-#include<iostream>
 #include<cstring>
-
+#include<unistd.h>
+#include<iostream>
+#include<stdlib.h>
+#include<pthread.h>
+#include<vector>
+#include<queue>
+#include<ctime>
+using namespace std;
 /*可能会继续增加
 logout退出登录功能
 */
+
 struct Time {
     int year;
     int month;
@@ -28,22 +34,12 @@ struct Time {
 class mission {
 private:
     std::string task_name;//任务名称
-    Time boot_time;//任务创建时间
     Time do_time;//任务开始时间
     Time remind_time;//提醒时间
     char priority;//优先级,这里用l,m,h代表优先级的低中高
     std::string category;//分类情况,分为"study","life","fun"代表学习、生活、娱乐
     int ID;//分配的ID
-    int state;//任务被创建后为1，任务被删除后为0
-    Time now() {//返回反映现在时间的Time类
-        time_t timep;
-        struct tm* p;
-        time(&timep); //获取从1970至今过了多少秒，存入time_t类型的timep
-        p = localtime(&timep);//用localtime将秒数转化为struct tm结构体
-        //存储格式：时 分 秒 年 月 日 
-        Time tmp_t(p->tm_hour, p->tm_min, p->tm_sec, 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
-        return tmp_t;
-    }
+
 public:
     mission(std::string t_name, Time d_time, Time r_time, char pri = 'm', std::string cat = "unclassified") {
         //任务名和提醒时间必须输入，优先级和分类不输入就是空，启动时间获取系统时间自动生成，ID自动生成
@@ -52,63 +48,52 @@ public:
         remind_time = r_time;
         priority = pri;
         category = cat;
-        state = 1;
-
-        time_t timep;
-        struct tm* p;
-        time(&timep); //获取从1970至今过了多少秒，存入time_t类型的timep
-        p = localtime(&timep);//用localtime将秒数转化为struct tm结构体
-        //存储格式：时 分 秒 年 月 日 
-        Time tmp_t(p->tm_hour, p->tm_min, p->tm_sec, 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
-        boot_time = tmp_t;
         //ID赋值在addtask函数中实现，将新生成的misson的ID赋值为最后一个mission的ID+1
     };
     void show()//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
     {
-        printf("%s %c %s\n", task_name, priority, category);
-        printf("%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
+        cout<<task_name<<" "<<priority<<" "<<category<<endl;
+        printf("%02d:%02d:%02d %d/%d/%d\n", do_time.hour, do_time.min, do_time.sec, do_time.year, do_time.month, do_time.day);
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
-    ~mission() { state = 0; }//将状态设置为被删除
+    ~mission() { }
     friend int time_cpr(const Time& a, const Time& b);
-    friend bool operator<(const mission &a,const mission &b);
+    friend bool operator<(const mission& a, const mission& b);
 };
 
-bool operator<(const mission &a,const mission &b){
-    if(time_cpr(a.remind_time,b.remind_time)== 1) return true;//如果a更晚返回true;
-    else if(time_cpr(a.remind_time,b.remind_time) == 0) {
-        if(a.priority=='h')return false;
-        else if(a.priority=='m'){
-            if(b.priority=='m'||b.priority=='l')return false;
+int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回-1，a和b同时等于返回0
+    if (a.year > b.year) return 1;
+    else if (a.year < b.year) return -1;
+    else {
+        int tmp1 = 0; int tmp2 = 0;
+        tmp1 = 100 * a.month + a.day;
+        tmp2 = 100 * b.month + b.day;
+        if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : -1;
+        tmp1 = 3600 * a.hour + 60 * a.min + a.sec;
+        tmp2 = 3600 * b.hour + 60 * b.min + b.sec;
+        if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : -1;
+        return 0;//最后肯定只能等于
+    }
+
+}
+
+bool operator<(const mission& a, const mission& b) {
+    if (time_cpr(a.remind_time, b.remind_time) == 1) return true;//如果a更晚返回true;
+    else if (time_cpr(a.remind_time, b.remind_time) == 0) {
+        if (a.priority == 'h')return false;
+        else if (a.priority == 'm') {
+            if (b.priority == 'm' || b.priority == 'l')return false;
         }
-        else if(b.priority=='l')return false;
-        else return true;
+        else return true ;
     }
     else return false;
 }
 
-int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
-    if (a.year > b.year) return 1;
-    else if (a.year < b.year) return 0;
-    else  {
-        int tmp1 = 0; int tmp2 = 0;
-        tmp1 = 100 * a.month + a.day;
-        tmp2 = 100 * b.month + b.day;
-        if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : 0;
-        tmp1 = 3600 * a.hour + 60 * a.min + a.sec;
-        tmp2 = 3600 * b.hour + 60 * b.min + b.sec;
-        if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : 0;
-        return 2;//最后肯定只能等于
-    }
-    
-}
-
-int g_ID = 0//为每个程序赋值ID
 
 void createuser();//创建用户
 void Complete_help();//展示完整的命令行帮助说明
 void login();//登录函数输入用户名、口令，包含加密过程
-void* check(void *arg);//子线程进行对提醒时间的检查,return NULL即可，不需要从子线程再获取数据
+void* check(void* arg);//子线程进行对提醒时间的检查,return NULL即可，不需要从子线程再获取数据
 void FileInput(string fileplace);//读入本地文件，存储到task_arraay中
 void run();//run了之后，开始执行各种命令的函数，各种命令都包含在这个大函数里面
 void addTask();
@@ -117,4 +102,5 @@ void addTask();
 void showTask();//注意自行设计显示方式
 void delTask();//根据任务id，删除某个指定任务
 void clearTask();//清空任务
-void synchronize();//将本地文件和内存task_array中的任务同步
+void synchronize();//将本地文件和内存task_array中的任务同步*/
+
