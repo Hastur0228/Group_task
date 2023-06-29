@@ -61,7 +61,7 @@ public:
         //存储格式：时 分 秒 年 月 日 
         Time tmp_t(p->tm_hour, p->tm_min, p->tm_sec, 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
         boot_time = tmp_t;
-        //ID赋值在addtask函数中实现，将新生成的mission的ID赋值为最后一个mission的ID+1
+        //ID赋值在addtask函数中实现，将新生成的misson的ID赋值为最后一个mission的ID+1
     };
     void show()//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
     {
@@ -69,14 +69,25 @@ public:
         printf("%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
-    void print_remind() {//打印提醒
-        printf("REMINDING: you need to do the task:%s", task_name);
-    }
     ~mission() { state = 0; }//将状态设置为被删除
-    friend int time_cmp(const Time& a, const Time& b);
+    friend int time_cpr(const Time& a, const Time& b);
+    friend bool operator<(const mission &a,const mission &b);
 };
 
-int time_cmp(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
+bool operator<(const mission &a,const mission &b){
+    if(time_cpr(a.remind_time,b.remind_time)== 1) return true;//如果a更晚返回true;
+    else if(time_cpr(a.remind_time,b.remind_time) == 0) {
+        if(a.priority=='h')return false;
+        else if(a.priority=='m'){
+            if(b.priority=='m'||b.priority=='l')return false;
+        }
+        else if(b.priority=='l')return false;
+        else return true;
+    }
+    else return false;
+}
+
+int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
     if (a.year > b.year) return 1;
     else if (a.year < b.year) return 0;
     else  {
