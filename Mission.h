@@ -69,6 +69,9 @@ public:
         printf("%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
+    void print_remind() {//打印提醒
+        printf("REMINDING: you need to do the task:%s", task_name);
+    }
     ~mission() { state = 0; }//将状态设置为被删除
     friend int time_cmp(const Time& a, const Time& b);
 };
