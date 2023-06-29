@@ -8,9 +8,11 @@
 #include<stdlib.h>
 #include<pthread.h>
 #include<vector>
+#include<queue>
 using namespace std;
 
-vector<mission>task_array;//读取本地文件中任务后，将任务存储在内存中的容器
+priority_queue<mission> task_array;//自定义成小根堆，堆顶是提醒时间靠前的
+//读取本地文件中任务后，将任务存储在内存中的容器
 pthread_t sub_thread_id;//子线程id
 pthread_mutex_t mutex;//互斥锁
 
@@ -19,7 +21,7 @@ int main(int argc,char *argv[]){
         cout<<"INPUT ERROR: Invalid parameters\n";//输入错误，参数无效
         exit(-1);
     }
-    char result;//用来接收getopt的信息
+    int result;//用来接收getopt的信息
     while((result=getopt(argc,argv,"h"))!=-1){
         if(result=='h'){
             Complete_help();//展示完整的命令行帮助说明和使用的范例
@@ -34,7 +36,6 @@ int main(int argc,char *argv[]){
         pthread_mutex_lock(&mutex);//设置互斥锁
         FileInput();//进入存储任务的文件，将本地文件读入task_array中
         pthread_mutex_unlock(&mutex);//解锁
-        
         while(true){
             run();
         } 
