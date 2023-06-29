@@ -46,6 +46,7 @@ void synchronize(string fileplace,priority_queue<mission> &task_array)
         }
         return 0;
 }
+
 //注意每一个操作后都要同步到本地文件，输入的任务，要保存到本地文件；每一个任务输入完成后自动保存到文件；
 void Complete_help() {
 	cout<<"完整的命令行帮助说明和使用范例\n";
@@ -162,6 +163,27 @@ void login()
 	}
 	fclose(fp);
 }
+
+void FileInput(string fileplace,priority_queue &array_task){
+       ifstream file(fileplace);
+       if(!file.is_open()){
+               printf("Error opening file\n");
+               return -1
+       }
+
+       while(!array_task.empty()){
+               array_task.pop();
+       }
+
+       mission a;
+
+       while(file>>a.task_name>>a.do_time.year>>a.do_time.month>>a.do_time.day>>a.do_time.hour>>a.do_time.min>>a.do_time.sec>>a.remind_time.year>>a.remind_time.month>>a.remind_time.day>>a.remind_time.hour>>a.remind_time.min>>a.remind_time.sec>>a.priority>>a.category>>a.ID){
+               array_task.push(a);
+       }
+
+       return 0;
+}
+
 void run(){
     string temp;
     cout<<"请输入命令: ";
