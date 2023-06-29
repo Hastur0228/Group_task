@@ -35,7 +35,7 @@ private:
     std::string category;//分类情况,分为"study","life","fun"代表学习、生活、娱乐
     int ID;//分配的ID
     int state;//任务被创建后为1，任务被删除后为0
-    Time now() {
+    Time now() {//返回反映现在时间的Time类
         time_t timep;
         struct tm* p;
         time(&timep); //获取从1970至今过了多少秒，存入time_t类型的timep
@@ -63,18 +63,17 @@ public:
         boot_time = tmp_t;
         //ID赋值在addtask函数中实现，将新生成的mission的ID赋值为最后一个mission的ID+1
     };
-    void show()//四行依次打印 名字 优先级 类别；开始时间；提醒时间；建立时间
+    void show()//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
     {
-        printf("name:%s priority:%c category:%s\n", task_name, priority, category);
-        printf("do_time:%02d:%02d:%02d %d/%d/%d\n", do_time.hour, do_time.min, do_time.sec, do_time.year, do_time.month, do_time.day);
-        printf("remind_time:%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
-        printf("boot_time:%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
+        printf("%s %c %s\n", task_name, priority, category);
+        printf("%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
+        printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
     ~mission() { state = 0; }//将状态设置为被删除
-    friend int cpr(const Time& a, const Time& b);
+    friend int time_cpr(const Time& a, const Time& b);
 };
 
-int cpr(const Time& a, const Time& b) {//大于返回1，小于返回0，等于返回2
+int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
     if (a.year > b.year) return 1;
     else if (a.year < b.year) return 0;
     else  {
@@ -90,9 +89,6 @@ int cpr(const Time& a, const Time& b) {//大于返回1，小于返回0，等于�
     
 }
 
-
-
-
 void createuser();//创建用户
 void Complete_help();//展示完整的命令行帮助说明
 void login();//登录函数输入用户名、口令，包含加密过程
@@ -106,4 +102,3 @@ void showTask();//注意自行设计显示方式
 void delTask();//根据任务id，删除某个指定任务
 void clearTask();//清空任务
 void synchronize();//将本地文件和内存task_array中的任务同步
-
