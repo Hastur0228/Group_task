@@ -70,10 +70,10 @@ public:
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
     ~mission() { state = 0; }//将状态设置为被删除
-    friend int time_cpr(const Time& a, const Time& b);
+    friend int time_cmp(const Time& a, const Time& b);
 };
 
-int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
+int time_cmp(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回0，a和b同时等于返回2
     if (a.year > b.year) return 1;
     else if (a.year < b.year) return 0;
     else  {
