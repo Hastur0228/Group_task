@@ -5,7 +5,6 @@
 #include"CODEANDDECODE.h"
 #include<time.h>
 #include<queue>
-#include"main.cpp"
 using namespace std;
 /*
 待实现函数：
