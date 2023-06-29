@@ -1,4 +1,5 @@
-﻿#include <iostream>
+#pragma once﻿
+#include <iostream>
 /*
 C:
     FILE*  fopen  fclose fread fscanf fgets fwrite fprintf fputs fseek ftell rewind
