@@ -5,6 +5,7 @@
 #include"CODEANDDECODE.h"
 #include<time.h>
 #include<queue>
+#include <fstream>
 using namespace std;
 
 /*
