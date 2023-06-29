@@ -19,7 +19,7 @@ int main(int argc,char *argv[]){
         cout<<"INPUT ERROR: Invalid parameters\n";//输入错误，参数无效
         exit(-1);
     }
-    int result;//用来接收getopt的信息
+    char result;//用来接收getopt的信息
     while((result=getopt(argc,argv,"h"))!=-1){
         if(result=='h'){
             Complete_help();//展示完整的命令行帮助说明和使用的范例
