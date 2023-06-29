@@ -65,7 +65,7 @@ public:
     };
     void show()//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
     {
-        printf("%s %s %s\n", task_name, priority, category);
+        printf("%s %c %s\n", task_name, priority, category);
         printf("%02d:%02d:%02d %d/%d/%d\n", boot_time.hour, boot_time.min, boot_time.sec, boot_time.year, boot_time.month, boot_time.day);
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
