@@ -303,31 +303,33 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 }
 
 void run(string fileplace, priority_queue<mission>& array_task) {
-	string temp;
+	string temp0;
 	cout << "请输入命令: ";
-	cin >> temp;//这儿用temp初步接受命令
-	if (temp == "addTask") {
+	cin >> temp0;//这儿用temp初步接受命令
+	const char *temp=nullptr;
+	temp=temp0.c_str();
+	if (strcasecmp(temp,"addTask")==0) {
 		addTask(fileplace,array_task);
 	}
-	else if (temp == "showTask") {
+	else if (strcasecmp(temp,"showTask")==0) {
 		showTask(array_task);
 	}
-	else if (temp == "delTask") {
-		cout << "please enter delID";
+	else if (strcasecmp(temp,"delTask")==0) {
+		cout << "please enter delID:";
 		int delID;
 		cin >> delID;
 		delTask(fileplace, array_task, delID);
 	}
-	else if (temp == "clearTask") {
+	else if (strcasecmp(temp,"clearTask")==0) {
 		clearTask(fileplace, array_task);
 	}
-	else if (temp == "createuser") {
+	else if (strcasecmp(temp,"createUser")==0) {
 		createuser();
 	}
-	else if (temp == "login") {
+	else if (strcasecmp(temp,"login")==0) {
 		login();
 	}
-	else if (temp == "exit") {
+	else if (strcasecmp(temp,"exit")==0) {
 		exit(0);
 	}
 	else {
