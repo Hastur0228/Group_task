@@ -7,6 +7,7 @@
 #include<time.h>
 #include<queue>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 /*
@@ -19,7 +20,7 @@ login修改有返回值
 */
 
 
-void synchronize(string fileplace, priority_queue<mission> task_array)
+void synchronize(string fileplace, priority_queue<mission>& task_array)
 {
 	FILE* fp = fopen(fileplace.c_str(), "w");
 
@@ -35,10 +36,10 @@ void synchronize(string fileplace, priority_queue<mission> task_array)
 		fputs(a.task_name.c_str(), fp);
 		fputs(" ", fp);
 		string time;
-		time = to_string(a.do_time.year) + ":" + to_string(a.do_time.month) + ":" + to_string(a.do_time.day) + ":" + to_String(a.do_time.hour) + ":" + to_string(a.do_time.min) + ":" + to_string(a.do_time.sec);
+		time = to_string(a.do_time.year) + ":" + to_string(a.do_time.month) + ":" + to_string(a.do_time.day) + ":" + to_string(a.do_time.hour) + ":" + to_string(a.do_time.min) + ":" + to_string(a.do_time.sec);
 		fputs(time.c_str(), fp);
 		fputs(" ", fp);
-		time = to_string(a.remind_time.year) + ":" + to_string(a.remind_time.month) + ":" + to_string(a.remind_time.day) + ":" + to_String(a.remind_time.hour) + ":" + to_string(a.remind_time.min) + ":" + to_string(a.remind_time.sec);
+		time = to_string(a.remind_time.year) + ":" + to_string(a.remind_time.month) + ":" + to_string(a.remind_time.day) + ":" + to_string(a.remind_time.hour) + ":" + to_string(a.remind_time.min) + ":" + to_string(a.remind_time.sec);
 		fputs(time.c_str(), fp);
 		fputs(" ", fp);
 		fprintf(fp, "%c ", a.priority);
@@ -90,9 +91,10 @@ void createuser()
 	fputs(password.c_str(), fp);
 	fputs("\n", fp);
 	fclose(fp);
+	fp = fopen(username.c_str(), "w");
 }
 
-void login()
+string login()
 {
 	string username;
 	string password;
@@ -122,10 +124,11 @@ void login()
 		string encode_username = cencode_username;
 		string encode_password = cencode_password;
 		decode(&encode_username, &encode_password);
+		return encode_username;
 		if (encode_username == username && encode_password == password)
 		{
 			cout << "登录成功！" << endl;
-			break;
+			return encode_username;
 		}
 	}
 	if (dismatch == 1)
@@ -134,9 +137,11 @@ void login()
 		login();
 	}
 	fclose(fp);
+	
 }
-void FileInput(string fileplace, priority_queue<mission>&array_task) {
+void FileInput(string fileplace, priority_queue<mission>& array_task) {
 	ifstream file(fileplace);
+
 	if (!file.is_open()) {
 		printf("Error opening file\n");
 		return;
@@ -147,29 +152,174 @@ void FileInput(string fileplace, priority_queue<mission>&array_task) {
 	}
 
 	mission a;
+	int new_ID = 0;
 
 	while (file >> a.task_name >> a.do_time.year >> a.do_time.month >> a.do_time.day >> a.do_time.hour >> a.do_time.min >> a.do_time.sec >> a.remind_time.year >> a.remind_time.month >> a.remind_time.day >> a.remind_time.hour >> a.remind_time.min >> a.remind_time.sec >> a.priority >> a.category >> a.ID) {
 		array_task.push(a);
+		if (a.ID > new_ID) new_ID = a.ID;
 	}
+
+	g_ID = new_ID;
+	return;
+}
+
+void showTask(priority_queue<mission>task_array) {
+	mission tmp;
+	while (!task_array.empty()) {
+		tmp = task_array.top();
+		show(tmp);
+		task_array.pop();
+	}
+}
+
+void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
+	priority_queue<mission> tmp;
+	mission trans;
+
+	while (array_task.top().ID != delID) {
+		trans = array_task.top();
+		array_task.pop();
+		tmp.push(trans);
+	}
+
+	array_task.pop();
+
+	while (!tmp.empty()) {
+		trans = tmp.top();
+		tmp.pop();
+		array_task.push(trans);
+	}
+
+	synchronize(fileplace, array_task);
+}
+
+void clearTask(string fileplace, priority_queue<mission> &task_array)
+{
+	while (!task_array.empty()) {
+		task_array.pop();
+	}
+
+	synchronize(fileplace, task_array);
+}
+
+
+void Stringsplit(string str, const char split, vector<string>& rst) {
+	istringstream iss(str);
+	string token;
+	while (getline(iss, token, split)) {
+		rst.push_back(token);
+	}
+}
+
+
+void addTask(string fileplace, priority_queue<mission>& task_array) 
+{
+	string unknown[5];
+	int cnt = 0;
+	string time_do, time_remind;
+
+	while (cin >> unknown[cnt]) {
+		cnt++;
+	}
+
+	mission a;
+	vector<string> data;
+
+	a.task_name = unknown[0];
+
+	Stringsplit(unknown[1], ':', data);
+	a.do_time.sec = atoi(data.back().c_str());
+	data.pop_back();
+	a.do_time.min = atoi(data.back().c_str());
+	data.pop_back();
+	a.do_time.hour = atoi(data.back().c_str());
+	data.pop_back();
+	a.do_time.day = atoi(data.back().c_str());
+	data.pop_back();
+	a.do_time.month = atoi(data.back().c_str());
+	data.pop_back();
+	a.do_time.year = atoi(data.back().c_str());
+	data.pop_back();
+
+	Stringsplit(unknown[2], ':', data);
+	a.remind_time.sec = atoi(data.back().c_str());
+	data.pop_back();
+	a.remind_time.min = atoi(data.back().c_str());
+	data.pop_back();
+	a.remind_time.hour = atoi(data.back().c_str());
+	data.pop_back();
+	a.remind_time.day = atoi(data.back().c_str());
+	data.pop_back();
+	a.remind_time.month = atoi(data.back().c_str());
+	data.pop_back();
+	a.remind_time.year = atoi(data.back().c_str());
+	data.pop_back();
+
+	if (cnt == 3) { a.priority = 'm'; a.category = "others"; }
+
+	else if (cnt == 4) {
+		if (strcasecmp(unknown[3].c_str(), "m") == 0 || strcasecmp(unknown[3].c_str(), "l") == 0 || strcasecmp(unknown[3].c_str(), "h") == 0) {
+			a.priority = unknown[3][0];
+			a.category = "others";
+		}
+		else { a.priority = 'm'; a.category = unknown[3]; }
+	}
+
+	else if (cnt == 5) {
+		if (strcasecmp(unknown[3].c_str(), "m") == 0 || strcasecmp(unknown[3].c_str(), "l") == 0 || strcasecmp(unknown[3].c_str(), "h") == 0) {
+			a.priority = unknown[3][0];
+			a.category = unknown[4];
+		}
+		else { a.priority = unknown[4][0]; a.category = unknown[3]; }
+	}
+
+	g_ID++;
+	a.ID = g_ID;
+
+	task_array.push(a);
+
+	FILE* fp = fopen(fileplace.c_str(), "a");
+
+	if (fp == NULL) {
+		printf("Error opening file\n");
+		return;
+	}
+
+	fputs(a.task_name.c_str(), fp);
+	fputs(" ", fp);
+	string time;
+	time = to_string(a.do_time.year) + " " + to_string(a.do_time.month) + " " + to_string(a.do_time.day) + " " + to_string(a.do_time.hour) + " " + to_string(a.do_time.min) + " " + to_string(a.do_time.sec);
+	fputs(time.c_str(), fp);
+	fputs(" ", fp);
+	time = to_string(a.remind_time.year) + " " + to_string(a.remind_time.month) + " " + to_string(a.remind_time.day) + " " + to_string(a.remind_time.hour) + " " + to_string(a.remind_time.min) + " " + to_string(a.remind_time.sec);
+	fputs(time.c_str(), fp);
+	fputs(" ", fp);
+	fprintf(fp, "%c ", a.priority);
+	fputs(a.category.c_str(), fp);
+	fputs(" ", fp);
+	fprintf(fp, "%d\n", a.ID);
 
 	return;
 }
 
-void run() {
+void run(string fileplace, priority_queue<mission>& array_task) {
 	string temp;
 	cout << "请输入命令: ";
 	cin >> temp;//这儿用temp初步接受命令
 	if (temp == "addTask") {
-		addTask();
+		addTask(fileplace,array_task);
 	}
 	else if (temp == "showTask") {
-		showTask();
+		showTask(array_task);
 	}
 	else if (temp == "delTask") {
-		delTask();
+		cout << "please enter delID";
+		int delID;
+		cin >> delID;
+		delTask(fileplace, array_task, delID);
 	}
 	else if (temp == "clearTask") {
-		clearTask();
+		clearTask(fileplace, array_task);
 	}
 	else if (temp == "createuser") {
 		createuser();
@@ -182,6 +332,6 @@ void run() {
 	}
 	else {
 		cout << "命令错误，请重新输入！" << endl;
-		run();
+		run(fileplace, array_task);
 	}
 }
