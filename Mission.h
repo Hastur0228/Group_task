@@ -61,6 +61,7 @@ public:
     ~mission() { }
     friend int time_cpr(const Time& a, const Time& b);
     friend bool operator<(const mission& a, const mission& b);
+    Time get_remind_time(){return remind_time;}
 };
 
 int time_cpr(const Time& a, const Time& b) {//a的时间更晚返回1，a的时间更早返回-1，a和b同时等于返回0
@@ -97,6 +98,7 @@ void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建�
     printf("%02d:%02d:%02d %d/%d/%d\n", a.do_time.hour, a.do_time.min, a.do_time.sec, a.do_time.year, a.do_time.month, a.do_time.day);
     printf("%02d:%02d:%02d %d/%d/%d\n", a.remind_time.hour, a.remind_time.min, a.remind_time.sec, a.remind_time.year, a.remind_time.month, a.remind_time.day);
 }
+
 void createuser();//创建用户
 void Complete_help();//展示完整的命令行帮助说明
 string login();//登录函数输入用户名、口令，包含加密过程
