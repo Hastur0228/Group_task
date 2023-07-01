@@ -23,15 +23,16 @@ void* check(void* arg)
 		time_t now = time(0);
 		struct tm* now_time;//tm来自time.h
 		now_time = localtime(&now);
-		Time top_task_time = task_array.top().get_reminding_time();
-		Time current_time = (now_time->tm_year, now_time->tm_mon, now_time->tm_mday, now_time->tm_hour, now_time->tm_min, now_time->tm_sec);
-		if (time_cpr(current_time, top_task_time) == 2) {//说明当前时间就是最早提醒时间，需要立刻提醒
+		mission top_task=task_array.top();
+        Time top_task_time = top_task.get_remind_time();
+		Time current_time = (now_time->tm_year+1900, now_time->tm_mon+1, now_time->tm_mday, now_time->tm_hour, now_time->tm_min, now_time->tm_sec);
+		if (time_cpr(current_time, top_task_time) == 0) {//说明当前时间就是最早提醒时间，需要立刻提醒
 			system("clear");
 			cout << "！！！！！！！！！！！\n";
 			cout << "您有任务已到达提醒时间\n";
 			cout << "请合理安排你的时间\n";
 			cout << "！！！！！！！！！！！\n";
-			show(task_array.top());
+			show(top_task);
 			task_array.pop();
 			synchronize(fileplace,task_array);
 		}
