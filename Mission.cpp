@@ -19,7 +19,7 @@ login修改有返回值
 */
 
 
-void synchronize(string fileplace, priority_queue<mission>& task_array)
+void synchronize(string fileplace, priority_queue<mission> task_array)
 {
 	FILE* fp = fopen(fileplace.c_str(), "w");
 
