@@ -56,6 +56,9 @@ public:
         printf("%02d:%02d:%02d %d/%d/%d\n", do_time.hour, do_time.min, do_time.sec, do_time.year, do_time.month, do_time.day);
         printf("%02d:%02d:%02d %d/%d/%d\n", remind_time.hour, remind_time.min, remind_time.sec, remind_time.year, remind_time.month, remind_time.day);
     }
+    Time get_reminding_time() {
+        return remind_time;
+    }
     ~mission() { }
     friend int time_cpr(const Time& a, const Time& b);
     friend bool operator<(const mission& a, const mission& b);
