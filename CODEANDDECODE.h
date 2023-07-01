@@ -15,13 +15,14 @@ linux:
 #include <unistd.h>
 void encode(string* username, string* password)//coding
 {
-    
+
     username ^= password;
     password ^= username;
-    return 0;
+    return;
 }
 void decode(string* username, string* password)//decoding
 {
     password ^= username;
     username ^= password;
+    return;
 }
