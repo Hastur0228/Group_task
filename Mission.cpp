@@ -241,6 +241,19 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	a.do_time.year = atoi(data.back().c_str());
 	data.pop_back();
 
+	priority_queue tmp;
+        mission cek;
+        tmp = task_array; 
+        while(!tmp.empty()){
+            cek = tmp.top();
+            if(cek.task_name == a.task_name && time_cpr(cek.do_time,a.do_time) == 0){
+            printf("Error:Already have the same task\n");
+            return -1;
+            }  
+	tmp.pop();
+        } 
+
+
 	Stringsplit(unknown[2], ':', data);
 	a.remind_time.sec = atoi(data.back().c_str());
 	data.pop_back();
