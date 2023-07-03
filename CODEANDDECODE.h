@@ -1,28 +1,22 @@
 #pragma once﻿
 #include <iostream>
-/*
-C:
-    FILE*  fopen  fclose fread fscanf fgets fwrite fprintf fputs fseek ftell rewind
-    r:只读 w:只写(新空文件) a:追加(尾部续写) r+:读写(必须存在) w+:读写(create) a+:读写(读取追加)(+b二进制形式）
-C++:
-    fstream open close read write get put seek
-windows:
-
-linux:
-
- */
 #include<stdio.h>
+#include<string.h>
 #include <unistd.h>
-void encode(string* username, string* password)//coding
-{
 
-    username ^= password;
-    password ^= username;
-    return;
+using namespace std;
+
+int key[] = { 1,1,4,5,1,4,8 };
+
+void encode(string& c) {
+	int len = c.size();
+	for (int i = 0; i < len; i++) {
+		c[i] = c[i] ^ key[i % 7];
+	}
 }
-void decode(string* username, string* password)//decoding
-{
-    password ^= username;
-    username ^= password;
-    return;
+void decode(string& c) {
+	int len = c.size();
+	for (int i = 0; i < len; i++) {
+		c[i] = c[i] ^ key[i % 7];
+	}
 }
