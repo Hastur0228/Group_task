@@ -212,7 +212,7 @@ void Stringsplit(string str, const char split, vector<string>& rst) {
 }
 
 
-void addTask(string fileplace, priority_queue<mission>& task_array) 
+void addTask(string fileplace, priority_queue<mission>& task_array)
 {
 	string unknown[5];
 	int cnt = 0;
@@ -241,17 +241,17 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	a.do_time.year = atoi(data.back().c_str());
 	data.pop_back();
 
-	priority_queue tmp;
-        mission cek;
-        tmp = task_array; 
-        while(!tmp.empty()){
-            cek = tmp.top();
-            if(cek.task_name == a.task_name && time_cpr(cek.do_time,a.do_time) == 0){
-            printf("Error:Already have the same task\n");
-            return -1;
-            }  
-	tmp.pop();
-        } 
+	priority_queue<mission>tmp;
+	mission cek;
+	tmp = task_array;
+	while (!tmp.empty()) {
+		cek = tmp.top();
+		if (cek.task_name == a.task_name && time_cpr(cek.do_time, a.do_time) == 0) {
+			printf("Error:Already have the same task\n");
+			return;
+		}
+		tmp.pop();
+	}
 
 
 	Stringsplit(unknown[2], ':', data);
@@ -315,34 +315,35 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	return;
 }
 
+
 void run(string fileplace, priority_queue<mission>& array_task) {
 	string temp0;
 	cout << "请输入命令: ";
 	cin >> temp0;//这儿用temp初步接受命令
-	const char *temp=nullptr;
-	temp=temp0.c_str();
-	if (strcasecmp(temp,"addTask")==0) {
-		addTask(fileplace,array_task);
+	const char* temp = nullptr;
+	temp = temp0.c_str();
+	if (strcasecmp(temp, "addTask") == 0) {
+		addTask(fileplace, array_task);
 	}
-	else if (strcasecmp(temp,"showTask")==0) {
+	else if (strcasecmp(temp, "showTask") == 0) {
 		showTask(array_task);
 	}
-	else if (strcasecmp(temp,"delTask")==0) {
+	else if (strcasecmp(temp, "delTask") == 0) {
 		cout << "please enter delID:";
 		int delID;
 		cin >> delID;
 		delTask(fileplace, array_task, delID);
 	}
-	else if (strcasecmp(temp,"clearTask")==0) {
+	else if (strcasecmp(temp, "clearTask") == 0) {
 		clearTask(fileplace, array_task);
 	}
-	else if (strcasecmp(temp,"createUser")==0) {
+	else if (strcasecmp(temp, "createUser") == 0) {
 		createuser();
 	}
-	else if (strcasecmp(temp,"login")==0) {
+	else if (strcasecmp(temp, "login") == 0) {
 		login();
 	}
-	else if (strcasecmp(temp,"exit")==0) {
+	else if (strcasecmp(temp, "exit") == 0) {
 		exit(0);
 	}
 	else {
