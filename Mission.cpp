@@ -77,7 +77,8 @@ void createuser()
 	cout << "请输入密码：";
 	cin >> password;
 	//加密
-	encode(&username, &password);
+	encode(username);
+	encode(password);
 	//将加密后的用户名和密码写入文件
 	FILE* fp;
 	fp = fopen("user.txt", "a");
@@ -92,6 +93,7 @@ void createuser()
 	fputs("\n", fp);
 	fclose(fp);
 	fp = fopen(username.c_str(), "w");
+	fclose(fp);
 }
 
 string login()
@@ -123,19 +125,22 @@ string login()
 		}
 		string encode_username = cencode_username;
 		string encode_password = cencode_password;
-		decode(&encode_username, &encode_password);
+		decode(encode_username);
+		decode(encode_password);
 		if (encode_username == username && encode_password == password)
 		{
 			cout << "登录成功！" << endl;
-			return encode_username;
+			fclose(fp);
+			return cencode_username;
 		}
 	}
 	if (dismatch == 1)
 	{
 		cout << "用户名或密码错误！" << endl;
+		fclose(fp);
 		login();
 	}
-	fclose(fp);
+	
 	
 }
 void FileInput(string fileplace, priority_queue<mission>& array_task) {
