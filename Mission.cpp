@@ -124,7 +124,6 @@ string login()
 		string encode_username = cencode_username;
 		string encode_password = cencode_password;
 		decode(&encode_username, &encode_password);
-		return encode_username;
 		if (encode_username == username && encode_password == password)
 		{
 			cout << "登录成功！" << endl;
