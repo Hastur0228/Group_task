@@ -1,5 +1,5 @@
 #ifndef Mission_h
-#define Mission_h
+#define Misson_h
 #include<cstring>
 #include<unistd.h>
 #include<iostream>
@@ -33,6 +33,7 @@ struct Time {
 
 class mission {
 public:
+    bool is_deleted = 0;//是否被删除
     std::string task_name;//任务名称
     Time do_time;//任务开始时间
     Time remind_time;//提醒时间
