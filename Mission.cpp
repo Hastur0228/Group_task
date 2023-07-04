@@ -52,7 +52,7 @@ Time get_reminding_time(mission subject) {
 }
 
 
-void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
+void show(const mission a)//三行依次打印 名字 优先级 类别 ； 执行时间 ； 提醒时间
 {
     cout << a.task_name << " " << a.priority << " " << a.category << endl;
     printf("%02d:%02d:%02d %d/%d/%d\n", a.do_time.hour, a.do_time.min, a.do_time.sec, a.do_time.year, a.do_time.month, a.do_time.day);
