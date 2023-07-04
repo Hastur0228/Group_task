@@ -1,13 +1,15 @@
 #include"Mission.h"
 #include<iostream>
 #include<cstring>
-#include<string>
+#include<string.h>
 #include<stdlib.h>
 #include"CODEANDDECODE.h"
 #include<time.h>
 #include<queue>
 #include <fstream>
+#include<strings.h>
 #include <sstream>
+#include<stdio.h>
 using namespace std;
 
 /*
@@ -18,8 +20,54 @@ logout函数
 login修改有返回值
 7.addTask()  showTask()  delTask()  clearTask()
 */
+int time_cpr(const Time& a, const Time& b)
+{//a的时间更晚返回1，a的时间更早返回-1，a和b同时等于返回0
+	if (a.year > b.year) return 1;
+	else if (a.year < b.year) return -1;
+	else {
+		int tmp1 = 0; int tmp2 = 0;
+		tmp1 = 100 * a.month + a.day;
+		tmp2 = 100 * b.month + b.day;
+		if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : -1;
+		tmp1 = 3600 * a.hour + 60 * a.min + a.sec;
+		tmp2 = 3600 * b.hour + 60 * b.min + b.sec;
+		if (tmp1 != tmp2) return (tmp1 > tmp2) ? 1 : -1;
+		return 0;//最后肯定只能等于
+	}
+}
+bool operator<(const mission& a, const mission& b)
+{
+	if (time_cpr(a.remind_time, b.remind_time) == 1) return true;//如果a更晚返回true;
+	else if (time_cpr(a.remind_time, b.remind_time) == 0) {
+		if (a.priority == 'h')return false;
+		else if (a.priority == 'm') {
+			if (b.priority == 'm' || b.priority == 'l')return false;
+		}
+		else return true;
+	}
+	else return false;
+}
+Time get_reminding_time(mission subject) {
+    return subject.remind_time;
+}
 
 
+void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
+{
+    cout << a.task_name << " " << a.priority << " " << a.category << endl;
+    printf("%02d:%02d:%02d %d/%d/%d\n", a.do_time.hour, a.do_time.min, a.do_time.sec, a.do_time.year, a.do_time.month, a.do_time.day);
+    printf("%02d:%02d:%02d %d/%d/%d\n", a.remind_time.hour, a.remind_time.min, a.remind_time.sec, a.remind_time.year, a.remind_time.month, a.remind_time.day);
+}
+
+string to_string(int a)
+{
+   ostringstream ostr;
+   ostr << a;
+   string astr = ostr.str();
+   //cout << astr <<endl;
+   return astr ;
+}
+   
 void synchronize(string fileplace, priority_queue<mission>& task_array)
 {
 	FILE* fp = fopen(fileplace.c_str(), "w");
@@ -70,13 +118,15 @@ void Complete_help() {
 
 void createuser()
 {
-	string username;
-	string password;
+	char username_x[100];
+	char password_x[100];
 	cout << "请输入用户名：";
-	cin >> username;
+	cin >> username_x;
 	cout << "请输入密码：";
-	cin >> password;
+	cin >> password_x;
 	//加密
+	string username=username_x;
+	string password=password_x;
 	encode(username);
 	encode(password);
 	//将加密后的用户名和密码写入文件
@@ -92,6 +142,8 @@ void createuser()
 	fputs(password.c_str(), fp);
 	fputs("\n", fp);
 	fclose(fp);
+	decode(username);
+	username += ".txt";
 	fp = fopen(username.c_str(), "w");
 	fclose(fp);
 }
@@ -102,8 +154,11 @@ string login()
 	string password;
 	cout << "请输入用户名：";
 	cin >> username;
+	username += '\n';
 	cout << "请输入密码：";
 	cin >> password;
+	password += '\n';
+	//加密
 	FILE* fp;
 	fp = fopen("user.txt", "r");
 	if (fp == NULL)
@@ -114,7 +169,7 @@ string login()
 	char cencode_username[100];
 	char cencode_password[100];
 	bool dismatch = 0;
-	while (1)
+	while (!feof(fp))
 	{
 		fgets(cencode_username, 100, fp);
 		fgets(cencode_password, 100, fp);
@@ -130,6 +185,14 @@ string login()
 		if (encode_username == username && encode_password == password)
 		{
 			cout << "登录成功！" << endl;
+			encode_username += ".txt";
+			int i, j;
+			for (i = 0, j = 0; i < encode_username.length(); i++)
+			{
+				if (encode_username[i] != '\n')
+					cencode_username[j++] = encode_username[i];
+			}
+			cencode_username[j] = '\0';
 			fclose(fp);
 			return cencode_username;
 		}
@@ -141,10 +204,10 @@ string login()
 		login();
 	}
 	
-	
 }
 void FileInput(string fileplace, priority_queue<mission>& array_task) {
-	ifstream file(fileplace);
+	
+	ifstream file(fileplace.c_str());
 
 	if (!file.is_open()) {
 		printf("Error opening file\n");
@@ -218,12 +281,14 @@ void Stringsplit(string str, const char split, vector<string>& rst) {
 
 void addTask(string fileplace, priority_queue<mission>& task_array)
 {
-	string unknown[5];
-	int cnt = 0;
 	string time_do, time_remind;
 
+	int cnt = 0;
+	string unknown[5];
 	while (cin >> unknown[cnt]) {
 		cnt++;
+		char ch = cin.get();
+		if (ch == '\n') break;
 	}
 
 	mission a;
@@ -324,7 +389,7 @@ void run(string fileplace, priority_queue<mission>& array_task) {
 	string temp0;
 	cout << "请输入命令: ";
 	cin >> temp0;//这儿用temp初步接受命令
-	const char* temp = nullptr;
+	const char* temp = NULL;
 	temp = temp0.c_str();
 	if (strcasecmp(temp, "addTask") == 0) {
 		addTask(fileplace, array_task);
@@ -352,6 +417,6 @@ void run(string fileplace, priority_queue<mission>& array_task) {
 	}
 	else {
 		cout << "命令错误，请重新输入！" << endl;
-		run(fileplace, array_task);
 	}
+	run(fileplace, array_task);
 }
