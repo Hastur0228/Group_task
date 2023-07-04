@@ -1,5 +1,5 @@
 #ifndef Mission_h
-#define Misson_h
+#define Mission_h
 #include<cstring>
 #include<unistd.h>
 #include<iostream>
