@@ -60,16 +60,30 @@ int main(int argc, char* argv[]) {
         }
     }
     if (strcasecmp(argv[1], "run") == 0) {//如果参数为run，则启动程序
-		pthread_create(&sub_thread_id, NULL, check, NULL);//
-		fileplace = login();//登录函数，包含口令加密过程
-        //登录之后就导入本地文件
-        pthread_mutex_init(&mutex, NULL);//互斥锁初始化
-        pthread_mutex_lock(&mutex);//设置互斥锁
-		FileInput(fileplace, task_array);//进入存储任务的文件，将本地文件读入task_array中
-        pthread_mutex_unlock(&mutex);//解锁
-        while (true) {
-            run(fileplace,task_array);
-        }
+		cout << "Please Enter your command.\n";
+		string temp0;
+		cin >> temp0;
+		char temp[20];
+		strcpy(temp, temp0.c_str());
+		if(strcasecmp(temp, "createuser") == 0)
+{
+			createuser();
+			exit(0);
+		}
+		else if(strcasecmp(temp, "login") == 0)
+		{
+			fileplace = login();//登录函数，包含口令加密过程
+			pthread_mutex_init(&mutex, NULL);//互斥锁初始化
+			FileInput(fileplace, task_array);//进入存储任务的文件，将本地文件读入task_array中
+			while (true) {
+				run(fileplace, task_array);
+			}
+		}
+		else
+		{
+			cout << "Please login first.\n";
+			exit(0);
+		}
     }
     else {//参数不为run说明日程管理还未启动
         cout << "Not Run Yet.\n";
