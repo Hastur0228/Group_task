@@ -52,11 +52,14 @@ Time get_reminding_time(mission subject) {
 }
 
 
-void show(const mission a)//三行依次打印 名字 优先级 类别 ； 执行时间 ； 提醒时间
+void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建立时间 ； 提醒时间
 {
-    cout << a.task_name << " " << a.priority << " " << a.category << endl;
-    printf("%02d:%02d:%02d %d/%d/%d\n", a.do_time.hour, a.do_time.min, a.do_time.sec, a.do_time.year, a.do_time.month, a.do_time.day);
-    printf("%02d:%02d:%02d %d/%d/%d\n", a.remind_time.hour, a.remind_time.min, a.remind_time.sec, a.remind_time.year, a.remind_time.month, a.remind_time.day);
+	if (a.is_deleted == 0)
+	{
+		cout << "id:" << a.ID << " name:" << a.task_name << " priority:" << a.priority << " category:" << a.category << endl;
+		printf("do time: %02d:%02d:%02d %d/%d/%d\n", a.do_time.hour, a.do_time.min, a.do_time.sec, a.do_time.year, a.do_time.month, a.do_time.day);
+		printf("remind time: %02d:%02d:%02d %d/%d/%d\n", a.remind_time.hour, a.remind_time.min, a.remind_time.sec, a.remind_time.year, a.remind_time.month, a.remind_time.day);
+	}
 }
 
 string to_string(int a)
@@ -76,26 +79,35 @@ void synchronize(string fileplace, priority_queue<mission>& task_array)
 		cout << "Error opening file\n";
 		return;
 	}
-
+	priority_queue<mission> tmp;
 	mission a;
 	while (!task_array.empty()) {
 		a = task_array.top();
 		task_array.pop();
-		fputs(a.task_name.c_str(), fp);
-		fputs(" ", fp);
-		string time;
-		time = to_string(a.do_time.year) + ":" + to_string(a.do_time.month) + ":" + to_string(a.do_time.day) + ":" + to_string(a.do_time.hour) + ":" + to_string(a.do_time.min) + ":" + to_string(a.do_time.sec);
-		fputs(time.c_str(), fp);
-		fputs(" ", fp);
-		time = to_string(a.remind_time.year) + ":" + to_string(a.remind_time.month) + ":" + to_string(a.remind_time.day) + ":" + to_string(a.remind_time.hour) + ":" + to_string(a.remind_time.min) + ":" + to_string(a.remind_time.sec);
-		fputs(time.c_str(), fp);
-		fputs(" ", fp);
-		fprintf(fp, "%c ", a.priority);
-		fputs(a.category.c_str(), fp);
-		fputs(" ", fp);
-		fprintf(fp, "%d\n", a.ID);
+		if (a.is_deleted == 0)
+		{
+			fputs(a.task_name.c_str(), fp);
+			fputs(" ", fp);
+			string time;
+			time = to_string(a.do_time.year) + " " + to_string(a.do_time.month) + " " + to_string(a.do_time.day) + " " + to_string(a.do_time.hour) + " " + to_string(a.do_time.min) + " " + to_string(a.do_time.sec);
+			fputs(time.c_str(), fp);
+			fputs(" ", fp);
+			time = to_string(a.remind_time.year) + " " + to_string(a.remind_time.month) + " " + to_string(a.remind_time.day) + " " + to_string(a.remind_time.hour) + " " + to_string(a.remind_time.min) + " " + to_string(a.remind_time.sec);
+			fputs(time.c_str(), fp);
+			fputs(" ", fp);
+			fprintf(fp, "%c ", a.priority);
+			fputs(a.category.c_str(), fp);
+			fputs(" ", fp);
+			fprintf(fp, "%d\n", a.ID);
+		}
+		tmp.push(a);
 	}
-	return;
+	while (!tmp.empty()) {
+		a = tmp.top();
+		tmp.pop();
+		task_array.push(a);
+	}
+	fclose(fp);
 }
 
 //注意每一个操作后都要同步到本地文件，输入的任务，要保存到本地文件；每一个任务输入完成后自动保存到文件；
@@ -173,11 +185,6 @@ string login()
 	{
 		fgets(cencode_username, 100, fp);
 		fgets(cencode_password, 100, fp);
-		if (cencode_username == 0)
-		{
-			dismatch = 1;
-			break;
-		}
 		string encode_username = cencode_username;
 		string encode_password = cencode_password;
 		decode(encode_username);
@@ -197,12 +204,9 @@ string login()
 			return cencode_username;
 		}
 	}
-	if (dismatch == 1)
-	{
-		cout << "用户名或密码错误！" << endl;
-		fclose(fp);
-		login();
-	}
+	cout << "用户名或密码错误！" << endl;
+	fclose(fp);
+	return login();
 	
 }
 void FileInput(string fileplace, priority_queue<mission>& array_task) {
@@ -231,25 +235,32 @@ void FileInput(string fileplace, priority_queue<mission>& array_task) {
 }
 
 void showTask(priority_queue<mission>task_array) {
-	mission tmp;
+	priority_queue<mission> tmp;
+	mission trans;
 	while (!task_array.empty()) {
-		tmp = task_array.top();
-		show(tmp);
+		trans = task_array.top();
+		show(trans);
 		task_array.pop();
+		tmp.push(trans);
+	}
+	while (!tmp.empty()) {
+		trans = tmp.top();
+		tmp.pop();
+		task_array.push(trans);
 	}
 }
 
 void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 	priority_queue<mission> tmp;
 	mission trans;
-
-	while (array_task.top().ID != delID) {
+	while (!array_task.empty()) 
+	{
 		trans = array_task.top();
+		if (array_task.top().ID == delID)
+			trans.is_deleted = 1;
 		array_task.pop();
 		tmp.push(trans);
 	}
-
-	array_task.pop();
 
 	while (!tmp.empty()) {
 		trans = tmp.top();
@@ -262,10 +273,19 @@ void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 
 void clearTask(string fileplace, priority_queue<mission> &task_array)
 {
+	mission tep;
+	priority_queue<mission> temp;
 	while (!task_array.empty()) {
+		tep=task_array.top();
+		tep.is_deleted = 1;
+		temp.push(tep);
 		task_array.pop();
 	}
-
+	while (!temp.empty()) {
+		tep = temp.top();
+		temp.pop();
+		task_array.push(tep);
+	}
 	synchronize(fileplace, task_array);
 }
 
@@ -287,6 +307,11 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	string unknown[5];
 	while (cin >> unknown[cnt]) {
 		cnt++;
+		if (cnt > 5)
+		{
+			cout << "error input" << endl;
+			addTask(fileplace, task_array);
+		}
 		char ch = cin.get();
 		if (ch == '\n') break;
 	}
@@ -315,7 +340,7 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	tmp = task_array;
 	while (!tmp.empty()) {
 		cek = tmp.top();
-		if (cek.task_name == a.task_name && time_cpr(cek.do_time, a.do_time) == 0) {
+		if (cek.task_name == a.task_name && time_cpr(cek.do_time, a.do_time) == 0 && cek.is_deleted == 0) {
 			printf("Error:Already have the same task\n");
 			return;
 		}
@@ -360,28 +385,7 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 
 	task_array.push(a);
 
-	FILE* fp = fopen(fileplace.c_str(), "a");
-
-	if (fp == NULL) {
-		printf("Error opening file\n");
-		return;
-	}
-
-	fputs(a.task_name.c_str(), fp);
-	fputs(" ", fp);
-	string time;
-	time = to_string(a.do_time.year) + " " + to_string(a.do_time.month) + " " + to_string(a.do_time.day) + " " + to_string(a.do_time.hour) + " " + to_string(a.do_time.min) + " " + to_string(a.do_time.sec);
-	fputs(time.c_str(), fp);
-	fputs(" ", fp);
-	time = to_string(a.remind_time.year) + " " + to_string(a.remind_time.month) + " " + to_string(a.remind_time.day) + " " + to_string(a.remind_time.hour) + " " + to_string(a.remind_time.min) + " " + to_string(a.remind_time.sec);
-	fputs(time.c_str(), fp);
-	fputs(" ", fp);
-	fprintf(fp, "%c ", a.priority);
-	fputs(a.category.c_str(), fp);
-	fputs(" ", fp);
-	fprintf(fp, "%d\n", a.ID);
-
-	return;
+	synchronize(fileplace, task_array);
 }
 
 
