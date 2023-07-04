@@ -19,6 +19,10 @@ pthread_mutex_t mutex;//互斥锁
 void* check(void* arg)
 {
 	while (1) {
+		if(task_array.empty()){
+			sleep(1);
+			continue;
+		}
 		pthread_mutex_lock(&mutex);//下面过程存在对任务文件改变的可能，故上锁
 		time_t now = time(0);
 		struct tm* now_time;//tm来自time.h
