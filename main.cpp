@@ -19,7 +19,7 @@ pthread_mutex_t mutex;//互斥锁
 void* check(void* arg)
 {
 	while (1) {
-		if(task_array.empty()){
+		if (task_array.empty()) {
 			sleep(1);
 			continue;
 		}
@@ -37,7 +37,7 @@ void* check(void* arg)
 			cout << "！！！！！！！！！！！\n";
 			show(task_array.top());
 			task_array.pop();
-			synchronize(fileplace,task_array);
+			synchronize(fileplace, task_array);
 		}
 		else if (time_cpr(current_time, top_task_time) == 1) {//当前时间晚于最早提醒时间了，说明之前预设的提醒时间存在错误
 			//此时指出用户的提醒时间有设置错误现象
@@ -52,33 +52,34 @@ void* check(void* arg)
 	return NULL;
 }
 int main(int argc, char* argv[]) {
-    if (argc != 2) {//参数个数不匹配
-        cout << "INPUT ERROR: Invalid parameters\n";//输入错误，参数无效
-        exit(-1);
-    }
-    int result;//用来接收getopt的信息
-    while ((result = getopt(argc, argv, "h")) != -1) {
-        if (result == 'h') {
-            Complete_help();//展示完整的命令行帮助说明和使用的范例
-            exit(0);//由于还没开始run就展示帮助，故这里直接退出程序
-        }
-    }
-    if (strcasecmp(argv[1], "run") == 0) {//如果参数为run，则启动程序
+	if (argc != 2) {//参数个数不匹配
+		cout << "INPUT ERROR: Invalid parameters\n";//输入错误，参数无效
+		exit(-1);
+	}
+	int result;//用来接收getopt的信息
+	while ((result = getopt(argc, argv, "h")) != -1) {
+		if (result == 'h') {
+			Complete_help();//展示完整的命令行帮助说明和使用的范例
+			exit(0);//由于还没开始run就展示帮助，故这里直接退出程序
+		}
+	}
+	if (strcasecmp(argv[1], "run") == 0) {//如果参数为run，则启动程序
 		cout << "Please Enter your command.\n";
 		string temp0;
 		cin >> temp0;
 		char temp[20];
 		strcpy(temp, temp0.c_str());
-		if(strcasecmp(temp, "createuser") == 0)
-{
+		if (strcasecmp(temp, "createuser") == 0)
+		{
 			createuser();
 			exit(0);
 		}
-		else if(strcasecmp(temp, "login") == 0)
+		else if (strcasecmp(temp, "login") == 0)
 		{
 			fileplace = login();//登录函数，包含口令加密过程
 			pthread_mutex_init(&mutex, NULL);//互斥锁初始化
 			FileInput(fileplace, task_array);//进入存储任务的文件，将本地文件读入task_array中
+			pthread_create(&sub_thread_id, NULL, check, NULL);
 			while (true) {
 				run(fileplace, task_array);
 			}
@@ -88,9 +89,9 @@ int main(int argc, char* argv[]) {
 			cout << "Please login first.\n";
 			exit(0);
 		}
-    }
-    else {//参数不为run说明日程管理还未启动
-        cout << "Not Run Yet.\n";
-        exit(0);
-    }
+	}
+	else {//参数不为run说明日程管理还未启动
+		cout << "Not Run Yet.\n";
+		exit(0);
+	}
 }
