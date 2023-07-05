@@ -12,14 +12,14 @@
 #include<stdio.h>
 using namespace std;
 
-/*
-待实现函数：
-1.mission类里的所有函数
-5.run（）函数（改）
-logout函数
-login修改有返回值
-7.addTask()  showTask()  delTask()  clearTask()
+/*Problem1:
+1.用户名不能有空格了这里
+2.输入时间的格式优化，并且要给出示例
 */
+
+extern pthread_mutex_t mutex;
+extern pthread_t sub_thread_id;
+
 int time_cpr(const Time& a, const Time& b)
 {//a的时间更晚返回1，a的时间更早返回-1，a和b同时等于返回0
 	if (a.year > b.year) return 1;
@@ -35,6 +35,7 @@ int time_cpr(const Time& a, const Time& b)
 		return 0;//最后肯定只能等于
 	}
 }
+
 bool operator<(const mission& a, const mission& b)
 {
 	if (time_cpr(a.remind_time, b.remind_time) == 1) return true;//如果a更晚返回true;
@@ -47,6 +48,7 @@ bool operator<(const mission& a, const mission& b)
 	}
 	else return false;
 }
+
 Time get_reminding_time(mission subject) {
     return subject.remind_time;
 }
@@ -62,19 +64,11 @@ void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建�
 	}
 }
 
-string to_string(int a)
-{
-   ostringstream ostr;
-   ostr << a;
-   string astr = ostr.str();
-   //cout << astr <<endl;
-   return astr ;
-}
-   
 void synchronize(string fileplace, priority_queue<mission>& task_array)
 {
 	FILE* fp = fopen(fileplace.c_str(), "w");
-
+	Time te(16546,244,553,124,845,26);
+	cout<<to_string(16546);
 	if (fp == NULL) {
 		cout << "Error opening file\n";
 		return;
@@ -253,6 +247,7 @@ void showTask(priority_queue<mission>task_array) {
 void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 	priority_queue<mission> tmp;
 	mission trans;
+	pthread_mutex_lock(&mutex);
 	while (!array_task.empty()) 
 	{
 		trans = array_task.top();
@@ -269,12 +264,14 @@ void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 	}
 
 	synchronize(fileplace, array_task);
+	pthread_mutex_unlock(&mutex);
 }
 
 void clearTask(string fileplace, priority_queue<mission> &task_array)
 {
 	mission tep;
 	priority_queue<mission> temp;
+	pthread_mutex_lock(&mutex);
 	while (!task_array.empty()) {
 		tep=task_array.top();
 		tep.is_deleted = 1;
@@ -287,6 +284,7 @@ void clearTask(string fileplace, priority_queue<mission> &task_array)
 		task_array.push(tep);
 	}
 	synchronize(fileplace, task_array);
+	pthread_mutex_unlock(&mutex);
 }
 
 
@@ -383,9 +381,11 @@ void addTask(string fileplace, priority_queue<mission>& task_array)
 	g_ID++;
 	a.ID = g_ID;
 
+	pthread_mutex_lock(&mutex);
 	task_array.push(a);
-
 	synchronize(fileplace, task_array);
+	pthread_mutex_unlock(&mutex);
+
 }
 
 
@@ -409,12 +409,6 @@ void run(string fileplace, priority_queue<mission>& array_task) {
 	}
 	else if (strcasecmp(temp, "clearTask") == 0) {
 		clearTask(fileplace, array_task);
-	}
-	else if (strcasecmp(temp, "createUser") == 0) {
-		createuser();
-	}
-	else if (strcasecmp(temp, "login") == 0) {
-		login();
 	}
 	else if (strcasecmp(temp, "exit") == 0) {
 		exit(0);
