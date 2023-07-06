@@ -50,7 +50,7 @@ bool operator<(const mission& a, const mission& b)
 }
 
 Time get_reminding_time(mission subject) {
-    return subject.remind_time;
+	return subject.remind_time;
 }
 
 
@@ -64,11 +64,18 @@ void show(const mission a)//三行依次打印 名字 优先级 类别 ； 建�
 	}
 }
 
+/*string to_string(int a)
+{
+	ostringstream ostr;
+	ostr << a;
+	string astr = ostr.str();
+	//cout << astr <<endl;
+	return astr;
+}*/
+
 void synchronize(string fileplace, priority_queue<mission>& task_array)
 {
 	FILE* fp = fopen(fileplace.c_str(), "w");
-	Time te(16546,244,553,124,845,26);
-	cout<<to_string(16546);
 	if (fp == NULL) {
 		cout << "Error opening file\n";
 		return;
@@ -131,8 +138,8 @@ void createuser()
 	cout << "请输入密码：";
 	cin >> password_x;
 	//加密
-	string username=username_x;
-	string password=password_x;
+	string username = username_x;
+	string password = password_x;
 	encode(username);
 	encode(password);
 	//将加密后的用户名和密码写入文件
@@ -201,10 +208,10 @@ string login()
 	cout << "用户名或密码错误！" << endl;
 	fclose(fp);
 	return login();
-	
+
 }
 void FileInput(string fileplace, priority_queue<mission>& array_task) {
-	
+
 	ifstream file(fileplace.c_str());
 
 	if (!file.is_open()) {
@@ -248,7 +255,7 @@ void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 	priority_queue<mission> tmp;
 	mission trans;
 	pthread_mutex_lock(&mutex);
-	while (!array_task.empty()) 
+	while (!array_task.empty())
 	{
 		trans = array_task.top();
 		if (array_task.top().ID == delID)
@@ -267,13 +274,13 @@ void delTask(string fileplace, priority_queue<mission>& array_task, int delID) {
 	pthread_mutex_unlock(&mutex);
 }
 
-void clearTask(string fileplace, priority_queue<mission> &task_array)
+void clearTask(string fileplace, priority_queue<mission>& task_array)
 {
 	mission tep;
 	priority_queue<mission> temp;
 	pthread_mutex_lock(&mutex);
 	while (!task_array.empty()) {
-		tep=task_array.top();
+		tep = task_array.top();
 		tep.is_deleted = 1;
 		temp.push(tep);
 		task_array.pop();
