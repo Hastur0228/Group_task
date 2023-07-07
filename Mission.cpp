@@ -303,6 +303,46 @@ void Stringsplit(string str, const char split, vector<string>& rst) {
 	}
 }
 
+void changeTask(string fileplace, priority_queue<mission>& array_task, int chgID) {
+	priority_queue<mission> tmp;
+	mission trans;
+	pthread_mutex_lock(&mutex);
+	while (!array_task.empty())
+	{
+		trans = array_task.top();
+		if (array_task.top().ID == chgID)
+			{
+				cout<<"请输入新的提醒时间\n";
+				string newtime;
+				vector<string> data;
+				cin>>newtime;
+				Stringsplit(newtime, ':', data);
+			    trans.remind_time.sec = atoi(data.back().c_str());
+				data.pop_back();
+				trans.remind_time.min = atoi(data.back().c_str());
+				data.pop_back();
+				trans.remind_time.hour = atoi(data.back().c_str());
+				data.pop_back();
+				trans.remind_time.day = atoi(data.back().c_str());
+				data.pop_back();
+				trans.remind_time.month = atoi(data.back().c_str());
+				data.pop_back();
+				trans.remind_time.year = atoi(data.back().c_str());
+				data.pop_back();
+			}
+		array_task.pop();
+		tmp.push(trans);
+	}
+
+	while (!tmp.empty()) {
+		trans = tmp.top();
+		tmp.pop();
+		array_task.push(trans);
+	}
+
+	synchronize(fileplace, array_task);
+	pthread_mutex_unlock(&mutex);
+}
 
 void addTask(string fileplace, priority_queue<mission>& task_array)
 {
@@ -408,6 +448,12 @@ void run(string fileplace, priority_queue<mission>& array_task) {
 	else if (strcasecmp(temp, "showTask") == 0) {
 		showTask(array_task);
 	}
+	else if (strcasecmp(temp, "changeTask") == 0) {
+		cout << "please enter changeID:";
+		int changeID;
+		cin >> changeID;
+		changeTask(fileplace, array_task, changeID);
+	}	
 	else if (strcasecmp(temp, "delTask") == 0) {
 		cout << "please enter delID:";
 		int delID;
