@@ -1,5 +1,5 @@
 #ifndef Mission_h
-#define Misson_h
+#define Mission_h
 #include<cstring>
 #include<unistd.h>
 #include<iostream>
@@ -78,4 +78,5 @@ void clearTask(string fileplace, priority_queue<mission>& task_array);//清空�
 void synchronize(string fileplace, priority_queue<mission>& task_array);//将本地文件和内存task_array中的任务同步*/
 Time get_reminding_time(mission subject);
 void show(const mission a);
+void changeTask(string fileplace, priority_queue<mission>& array_task, int delID);//根据任务id，修改某个指定任务的提醒时间
 #endif
